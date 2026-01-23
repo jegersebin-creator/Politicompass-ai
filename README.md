@@ -1,20 +1,31 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# PolitiCompass AI
 
-# Run and deploy your AI Studio app
+A modern, Apple-inspired political alignment analyzer supporting multiple languages and powered by Gemini AI for in-depth insight.
 
-This contains everything you need to run your app locally.
+## Overview
 
-View your app in AI Studio: https://ai.studio/apps/drive/10Sg0TgrLu8Hw_2Txoa2uqGmKY_43PXDE
+This application determines your political stance based on a series of questions regarding economic and social issues. It plots your result on a classic political compass (Authoritarian/Libertarian vs Left/Right) and uses the Gemini API to generate a personalized analysis of your worldview.
 
-## Run Locally
+## Getting Started
 
-**Prerequisites:**  Node.js
+### Prerequisites
 
+- Node.js
+- A Google Gemini API Key
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### Configuration
+
+To enable the AI analysis features, you must provide your API key.
+See `.env.local` for details on how to configure your `API_KEY` variable.
+
+> **Note:** Never commit your API keys to version control.
+
+## Technologies Used
+
+- **Frontend**: React, Tailwind CSS
+- **AI**: Google GenAI SDK
+- **Utilities**: HTML2Canvas for result exporting
+
+## License
+
+MIT
