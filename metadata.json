@@ -1,0 +1,5 @@
+{
+  "name": "PolitiCompass AI",
+  "description": "A modern, Apple-inspired political alignment analyzer supporting multiple languages and powered by Gemini AI for in-depth insight.",
+  "requestFramePermissions": []
+}
