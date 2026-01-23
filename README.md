@@ -16,7 +16,7 @@ This application determines your political stance based on a series of questions
 ### Configuration
 
 To enable the AI analysis features, you must provide your API key.
-See `.env.local` for details on how to configure your `API_KEY` variable.
+Please configure your `API_KEY` variable in a `.env.local` file.
 
 > **Note:** Never commit your API keys to version control.
 
@@ -29,3 +29,4 @@ See `.env.local` for details on how to configure your `API_KEY` variable.
 ## License
 
 MIT
+
