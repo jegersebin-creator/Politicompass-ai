@@ -13,7 +13,7 @@ export interface Translation {
   right: string;
   libertarian: string;
   authoritarian: string;
-  geminiAnalysis: string;
+  geminiAnalysis: string; // Keeping key for compatibility, but will use as "Analysis" header
   restart: string;
   agreeStrongly: string;
   agree: string;
@@ -24,6 +24,8 @@ export interface Translation {
   download: string;
   share: string;
   copied: string;
+  ideologies: string;
+  close: string;
 }
 
 export interface Question {
@@ -41,8 +43,31 @@ export interface QuizResult {
   answers: Record<number, number>; // questionId -> score (-2 to 2)
 }
 
+// Deprecated but kept for type compatibility if needed, though we use IdeologyDetail now
 export interface GeminiAnalysis {
   ideology: string;
   description: string;
   keyFactors: string[];
+}
+
+export interface IdeologyDetail {
+  name: string;
+  definition: string;
+  explanation: string;
+  figures: string;
+  keywords: string;
+  coords: { x: number; y: number }; // Target coordinates on the compass (-10 to 10)
+}
+
+export interface PoliticalFigure {
+  name: string;
+  x: number; // Scale -10 to +10
+  y: number; // Scale -10 to +10
+  description: string;
+}
+
+export interface QuadrantInfo {
+  name: string;
+  description: string;
+  items: IdeologyDetail[];
 }

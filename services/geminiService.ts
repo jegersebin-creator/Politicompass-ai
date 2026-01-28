@@ -8,18 +8,18 @@ const getGeminiAnalysis = async (
   ecoScore: number,
   socScore: number
 ): Promise<GeminiAnalysis> => {
-  const apiKey = import.meta.env.VITE_API_KEY;
+  const apiKey = process.env.API_KEY;
 
-if (!apiKey) {
-  console.error("API Key not found");
-  return {
-    ideology: "Unknown",
-    description: "API Key missing. Cannot generate analysis.",
-    keyFactors: []
-  };
-}
+  if (!apiKey) {
+    console.error("API Key not found");
+    return {
+      ideology: "Unknown",
+      description: "API Key missing. Cannot generate analysis.",
+      keyFactors: []
+    };
+  }
 
-const ai = new GoogleGenAI({ apiKey: apiKey });
+  const ai = new GoogleGenAI({ apiKey: apiKey });
 
   // Construct a textual representation of the user's stance
   const userResponses = Object.entries(answers).map(([id, score]) => {

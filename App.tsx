@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { LanguageCode } from './types';
-import { TRANSLATIONS, QUESTIONS } from './constants';
+import { TRANSLATIONS, QUESTIONS, IDEOLOGIES } from './constants';
 import LanguageSelector from './components/LanguageSelector';
 import Quiz from './components/Quiz';
 import Result from './components/Result';
+import IdeologySidebar from './components/IdeologySidebar';
 
 type AppState = 'intro' | 'quiz' | 'result';
 
@@ -12,6 +13,7 @@ function App() {
   const [appState, setAppState] = useState<AppState>('intro');
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [scores, setScores] = useState({ eco: 0, soc: 0 });
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const t = TRANSLATIONS[language];
 
@@ -62,11 +64,30 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col font-sans text-gray-900 selection:bg-blue-200">
       
+      {/* Sidebar Component */}
+      <IdeologySidebar 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+        data={IDEOLOGIES[language]}
+        translations={t}
+      />
+
       {/* Header */}
       <header className="w-full p-6 flex justify-between items-center max-w-7xl mx-auto z-10">
-        <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-tr from-green-600 to-emerald-600 rounded-lg shadow-lg flex items-center justify-center text-white font-bold text-lg">P</div>
-            <h1 className="font-semibold text-xl tracking-tight hidden sm:block">PolitiCompass</h1>
+        <div className="flex items-center space-x-4">
+            <button 
+                onClick={() => setIsSidebarOpen(true)}
+                className="p-2 -ml-2 rounded-full hover:bg-white/50 transition-colors group"
+                aria-label="Open Ideologies Menu"
+            >
+                <svg className="w-6 h-6 text-gray-700 group-hover:text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+                </svg>
+            </button>
+            <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-tr from-green-600 to-emerald-600 rounded-lg shadow-lg flex items-center justify-center text-white font-bold text-lg cursor-default">P</div>
+                <h1 className="font-semibold text-xl tracking-tight hidden sm:block cursor-default">PolitiCompass</h1>
+            </div>
         </div>
         <LanguageSelector currentLanguage={language} onLanguageChange={setLanguage} />
       </header>

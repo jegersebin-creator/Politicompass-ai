@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Translation, GeminiAnalysis, LanguageCode } from '../types';
-import { getGeminiAnalysis } from '../services/geminiService';
+import { Translation, IdeologyDetail, LanguageCode, PoliticalFigure } from '../types';
+import { IDEOLOGIES, POLITICAL_FIGURES } from '../constants';
 import html2canvas from 'html2canvas';
 
 interface ResultProps {
@@ -12,42 +12,62 @@ interface ResultProps {
   onRestart: () => void;
 }
 
-const Result: React.FC<ResultProps> = ({ ecoScore, socScore, answers, translations, language, onRestart }) => {
-  const [analysis, setAnalysis] = useState<GeminiAnalysis | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
+const Result: React.FC<ResultProps> = ({ ecoScore, socScore, translations, language, onRestart }) => {
+  const [matchedIdeology, setMatchedIdeology] = useState<IdeologyDetail | null>(null);
+  const [selectedFigure, setSelectedFigure] = useState<PoliticalFigure | null>(null);
   const resultRef = useRef<HTMLDivElement>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    let isMounted = true;
-    const fetchAnalysis = async () => {
-      try {
-        const result = await getGeminiAnalysis(answers, language, ecoScore, socScore);
-        if (isMounted) {
-          setAnalysis(result);
-          setLoading(false);
-        }
-      } catch (e) {
-        console.error(e);
-        if (isMounted) setLoading(false);
-      }
-    };
-    fetchAnalysis();
-    return () => { isMounted = false; };
-  }, [answers, language, ecoScore, socScore]);
+    // Logic to find the closest ideology based on Euclidean distance
+    const findClosestIdeology = () => {
+      const allIdeologies = IDEOLOGIES[language].flatMap(quadrant => quadrant.items);
+      
+      let closest: IdeologyDetail | null = null;
+      let minDistance = Infinity;
 
-  // Determine background gradient for the analysis card based on result
+      allIdeologies.forEach(ideology => {
+        // Calculate distance: sqrt((x2 - x1)^2 + (y2 - y1)^2)
+        const dist = Math.sqrt(
+          Math.pow(ideology.coords.x - ecoScore, 2) + 
+          Math.pow(ideology.coords.y - socScore, 2)
+        );
+
+        if (dist < minDistance) {
+          minDistance = dist;
+          closest = ideology;
+        }
+      });
+
+      setMatchedIdeology(closest);
+    };
+
+    findClosestIdeology();
+  }, [ecoScore, socScore, language]);
+
+  // Determine background gradient based on scores (for visual feedback)
   const getGradient = () => {
     if (ecoScore < 0 && socScore > 0) return "from-red-50 to-red-100/50"; // Auth Left
     if (ecoScore > 0 && socScore > 0) return "from-blue-50 to-blue-100/50"; // Auth Right
     if (ecoScore < 0 && socScore < 0) return "from-green-50 to-green-100/50"; // Lib Left
-    if (ecoScore > 0 && socScore < 0) return "from-yellow-50 to-yellow-100/50"; // Lib Right (Yellow now)
+    if (ecoScore > 0 && socScore < 0) return "from-yellow-50 to-yellow-100/50"; // Lib Right
     return "from-gray-50 to-gray-100/50";
   };
 
-  // Calculate position percentages (0-100%)
-  const xPercent = ((ecoScore + 10) / 20) * 100;
-  const yPercent = ((10 - socScore) / 20) * 100;
+  // Helper to get percentages for css positioning
+  const getPercent = (val: number, isX: boolean) => {
+    // Input range -10 to 10
+    // X: -10 is 0%, 10 is 100%
+    // Y: 10 is 0% (top), -10 is 100% (bottom)
+    if (isX) {
+      return ((val + 10) / 20) * 100;
+    } else {
+      return ((10 - val) / 20) * 100;
+    }
+  };
+
+  const xPercent = getPercent(ecoScore, true);
+  const yPercent = getPercent(socScore, false);
 
   const handleDownload = async () => {
     if (resultRef.current) {
@@ -82,8 +102,34 @@ const Result: React.FC<ResultProps> = ({ ecoScore, socScore, answers, translatio
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 pb-12 animate-fade-in">
+    <div className="w-full max-w-6xl mx-auto px-4 pb-12 animate-fade-in relative">
         
+        {/* Figure Detail Modal/Overlay */}
+        {selectedFigure && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedFigure(null)}>
+            <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 max-w-md w-full animate-fade-in-up border border-white/20" onClick={e => e.stopPropagation()}>
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900">{selectedFigure.name}</h3>
+                <button 
+                  onClick={() => setSelectedFigure(null)}
+                  className="p-1 rounded-full hover:bg-gray-100 text-gray-500 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-gray-600 leading-relaxed text-sm md:text-base">
+                {selectedFigure.description}
+              </p>
+              <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between text-xs text-gray-400 font-mono">
+                <span>Eco: {(selectedFigure.x / 2).toFixed(1)}</span>
+                <span>Soc: {(selectedFigure.y / 2).toFixed(1)}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Content to capture */}
         <div id="capture-target" ref={resultRef} className="p-4 md:p-8 rounded-[3rem] bg-[#F5F5F7]">
             <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-900 mb-12 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 pb-2">
@@ -109,7 +155,7 @@ const Result: React.FC<ResultProps> = ({ ecoScore, socScore, answers, translatio
                                 </div>
 
                                 {/* Chart */}
-                                <div className="relative w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] border-[3px] border-gray-800 bg-white shadow-inner">
+                                <div className="relative w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] border-[3px] border-gray-800 bg-white shadow-inner select-none">
                                     {/* 2x2 Grid for Backgrounds */}
                                     <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
                                         {/* Auth Left (Red) */}
@@ -140,32 +186,37 @@ const Result: React.FC<ResultProps> = ({ ecoScore, socScore, answers, translatio
 
                                     {/* Axes Lines */}
                                     <div className="absolute inset-0 pointer-events-none">
-                                        {/* Horizontal Axis */}
                                         <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gray-800"></div>
-                                        {/* Vertical Axis */}
                                         <div className="absolute left-1/2 top-0 bottom-0 w-[2px] bg-gray-800"></div>
-                                        
-                                        {/* Axis Arrows */}
-                                        {/* Top Arrow */}
+                                        {/* Arrows */}
                                         <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-[5px] w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-gray-800"></div>
-                                        {/* Right Arrow */}
                                         <div className="absolute top-1/2 right-0 translate-x-[5px] -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[10px] border-l-gray-800"></div>
-                                        {/* Bottom Arrow */}
                                         <div className="absolute left-1/2 bottom-0 -translate-x-1/2 translate-y-[5px] w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[10px] border-t-gray-800"></div>
-                                        {/* Left Arrow */}
                                         <div className="absolute top-1/2 left-0 -translate-x-[5px] -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[10px] border-r-gray-800"></div>
                                     </div>
 
-                                    {/* Small Grid ticks (Optional detail) */}
+                                    {/* Small Grid ticks */}
                                     <div className="absolute inset-0 grid grid-cols-10 grid-rows-10 pointer-events-none opacity-20">
                                         {Array.from({ length: 100 }).map((_, i) => (
                                             <div key={i} className="border-[0.5px] border-gray-600/30"></div>
                                         ))}
                                     </div>
 
-                                    {/* Data Point Marker */}
+                                    {/* Other Political Figures */}
+                                    {POLITICAL_FIGURES.map((figure) => (
+                                      <button
+                                        key={figure.name}
+                                        onClick={() => setSelectedFigure(figure)}
+                                        className="absolute w-3 h-3 -ml-1.5 -mt-1.5 bg-gray-700/60 hover:bg-gray-900 rounded-full cursor-pointer hover:scale-150 transition-transform z-10 group"
+                                        style={{ left: `${getPercent(figure.x, true)}%`, top: `${getPercent(figure.y, false)}%` }}
+                                        aria-label={`View ${figure.name}`}
+                                      >
+                                      </button>
+                                    ))}
+
+                                    {/* User Data Point Marker */}
                                     <div 
-                                        className="absolute w-5 h-5 -ml-2.5 -mt-2.5 bg-red-600 border-2 border-white rounded-full shadow-[0_0_10px_rgba(0,0,0,0.5)] z-20"
+                                        className="absolute w-5 h-5 -ml-2.5 -mt-2.5 bg-red-600 border-2 border-white rounded-full shadow-[0_0_10px_rgba(0,0,0,0.5)] z-20 pointer-events-none"
                                         style={{ left: `${xPercent}%`, top: `${yPercent}%` }}
                                     >
                                         <div className="absolute inset-0 rounded-full bg-red-600 animate-ping opacity-40"></div>
@@ -182,55 +233,62 @@ const Result: React.FC<ResultProps> = ({ ecoScore, socScore, answers, translatio
                             <div className="mt-2 font-bold text-gray-700 uppercase tracking-widest text-xs sm:text-sm">
                                 {translations.libertarian}
                             </div>
+                            
+                            <p className="mt-4 text-xs text-gray-400 font-medium">Click on the gray dots to see historical figures</p>
                         </div>
 
                     </div>
                 </div>
 
-                {/* Analysis Section */}
+                {/* Analysis Section (Now using Static Data) */}
                 <div className={`bg-gradient-to-br ${getGradient()} rounded-[2.5rem] p-8 md:p-10 flex flex-col relative h-full min-h-[500px] border border-white/50 shadow-xl transition-all duration-500`}>
-                <div className="flex items-center space-x-3 mb-8">
-                    <div className="bg-white/80 backdrop-blur-md p-2.5 rounded-2xl shadow-sm">
-                        <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    <div className="flex items-center space-x-3 mb-8">
+                        <div className="bg-white/80 backdrop-blur-md p-2.5 rounded-2xl shadow-sm">
+                            <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-800 tracking-wide uppercase opacity-70">{translations.geminiAnalysis}</h3>
                     </div>
-                    <h3 className="text-lg font-bold text-gray-800 tracking-wide uppercase opacity-70">{translations.geminiAnalysis}</h3>
-                </div>
 
-                {loading ? (
-                    <div className="flex-1 flex flex-col items-center justify-center space-y-6">
-                    <div className="relative">
-                        <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-800 rounded-full animate-spin"></div>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-8 h-8 bg-gray-100 rounded-full animate-pulse"></div>
-                        </div>
-                    </div>
-                    <p className="text-gray-500 font-medium animate-pulse">{translations.analyzing}</p>
-                    </div>
-                ) : (
-                    <div className="flex-1 animate-fade-in-up">
-                        <div className="mb-8">
-                            <h4 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
-                                {analysis?.ideology || "Unknown"}
-                            </h4>
-                            <p className="text-gray-700 leading-relaxed text-lg font-medium opacity-90">
-                                {analysis?.description}
-                            </p>
-                        </div>
-                        
-                        {analysis?.keyFactors && (
-                            <div className="bg-white/40 backdrop-blur-md rounded-2xl p-6 border border-white/40 shadow-sm">
-                                <ul className="space-y-4">
-                                    {analysis.keyFactors.map((factor, idx) => (
-                                        <li key={idx} className="flex items-start">
-                                            <span className="flex-shrink-0 w-1.5 h-1.5 mt-2.5 mr-3 bg-gray-800 rounded-full"></span>
-                                            <span className="text-gray-800 text-md leading-relaxed">{factor}</span>
-                                        </li>
-                                    ))}
-                                </ul>
+                    {!matchedIdeology ? (
+                        <div className="flex-1 flex flex-col items-center justify-center space-y-6">
+                            <div className="relative">
+                                <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-800 rounded-full animate-spin"></div>
                             </div>
-                        )}
-                    </div>
-                )}
+                            <p className="text-gray-500 font-medium animate-pulse">{translations.analyzing}</p>
+                        </div>
+                    ) : (
+                        <div className="flex-1 animate-fade-in-up">
+                            <div className="mb-6">
+                                <h4 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                                    {matchedIdeology.name}
+                                </h4>
+                                <div className="bg-white/40 backdrop-blur-sm rounded-xl p-4 mb-4 border border-white/40">
+                                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Definition</p>
+                                    <p className="text-gray-800 text-sm italic">{matchedIdeology.definition}</p>
+                                </div>
+                                <p className="text-gray-700 leading-relaxed text-lg font-medium opacity-90">
+                                    {matchedIdeology.explanation}
+                                </p>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                                <div className="bg-white/40 backdrop-blur-md rounded-2xl p-5 border border-white/40 shadow-sm">
+                                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Key Figures</p>
+                                    <p className="text-gray-900 font-semibold">{matchedIdeology.figures}</p>
+                                </div>
+                                <div className="bg-white/40 backdrop-blur-md rounded-2xl p-5 border border-white/40 shadow-sm">
+                                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Keywords</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {matchedIdeology.keywords.split(',').map((k, i) => (
+                                            <span key={i} className="px-2 py-1 bg-white/60 rounded-md text-xs font-medium text-gray-700 border border-gray-100">
+                                                {k.trim()}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
