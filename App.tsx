@@ -5,8 +5,9 @@ import LanguageSelector from './components/LanguageSelector';
 import Quiz from './components/Quiz';
 import Result from './components/Result';
 import IdeologySidebar from './components/IdeologySidebar';
+import Board from './components/Board';
 
-type AppState = 'intro' | 'quiz' | 'result';
+type AppState = 'intro' | 'quiz' | 'result' | 'board';
 
 function App() {
   const [language, setLanguage] = useState<LanguageCode>('en');
@@ -61,6 +62,10 @@ function App() {
     setScores({ eco: 0, soc: 0 });
   };
 
+  const handleGoHome = () => {
+      setAppState('intro');
+  }
+
   return (
     <div className="min-h-screen flex flex-col font-sans text-gray-900 selection:bg-blue-200">
       
@@ -84,12 +89,21 @@ function App() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
                 </svg>
             </button>
-            <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-tr from-green-600 to-emerald-600 rounded-lg shadow-lg flex items-center justify-center text-white font-bold text-lg cursor-default">P</div>
-                <h1 className="font-semibold text-xl tracking-tight hidden sm:block cursor-default">PolitiCompass</h1>
+            <div className="flex items-center space-x-2 cursor-pointer" onClick={handleGoHome}>
+                <div className="w-8 h-8 bg-gradient-to-tr from-green-600 to-emerald-600 rounded-lg shadow-lg flex items-center justify-center text-white font-bold text-lg">P</div>
+                <h1 className="font-semibold text-xl tracking-tight hidden sm:block">PolitiCompass</h1>
             </div>
         </div>
-        <LanguageSelector currentLanguage={language} onLanguageChange={setLanguage} />
+        
+        <div className="flex items-center space-x-4">
+             <button
+                onClick={() => setAppState('board')}
+                className={`text-sm font-medium transition-colors ${appState === 'board' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'}`}
+            >
+                {t.board}
+            </button>
+            <LanguageSelector currentLanguage={language} onLanguageChange={setLanguage} />
+        </div>
       </header>
 
       {/* Main Content */}
@@ -139,6 +153,10 @@ function App() {
                 language={language}
                 onRestart={handleRestart}
             />
+            )}
+
+            {appState === 'board' && (
+                <Board translations={t} language={language} onBack={handleGoHome} />
             )}
         </div>
       </main>

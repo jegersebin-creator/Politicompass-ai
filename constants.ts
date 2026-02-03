@@ -35,6 +35,22 @@ export const TRANSLATIONS: Record<LanguageCode, Translation> = {
     copied: "Link Copied!",
     ideologies: "Ideologies",
     close: "Close",
+    // Board
+    boardTitle: "Board",
+    newPost: "New Post",
+    createPost: "Create a Post",
+    postTitlePlaceholder: "Title",
+    postContentPlaceholder: "Share your thoughts...",
+    authorPlaceholder: "Your Name (Optional)",
+    submit: "Post",
+    cancel: "Cancel",
+    comments: "Comments",
+    addComment: "Add a comment...",
+    noPosts: "No posts yet. Be the first to share!",
+    readMore: "Read More",
+    board: "Board",
+    communityTab: "Community",
+    guideTab: "Ideology Guide"
   },
   es: {
     title: "¿Cuál es tu alineación política?",
@@ -62,6 +78,22 @@ export const TRANSLATIONS: Record<LanguageCode, Translation> = {
     copied: "¡Enlace Copiado!",
     ideologies: "Ideologías",
     close: "Cerrar",
+    // Board
+    boardTitle: "Foro",
+    newPost: "Nueva Publicación",
+    createPost: "Crear Publicación",
+    postTitlePlaceholder: "Título",
+    postContentPlaceholder: "Comparte tus pensamientos...",
+    authorPlaceholder: "Tu Nombre (Opcional)",
+    submit: "Publicar",
+    cancel: "Cancelar",
+    comments: "Comentarios",
+    addComment: "Añadir un comentario...",
+    noPosts: "No hay publicaciones. ¡Sé el primero!",
+    readMore: "Leer más",
+    board: "Foro",
+    communityTab: "Comunidad",
+    guideTab: "Guía Ideológica"
   },
   fr: {
     title: "Quel est votre alignement politique ?",
@@ -89,6 +121,22 @@ export const TRANSLATIONS: Record<LanguageCode, Translation> = {
     copied: "Lien Copié !",
     ideologies: "Idéologies",
     close: "Fermer",
+    // Board
+    boardTitle: "Forum",
+    newPost: "Nouveau Post",
+    createPost: "Créer un Post",
+    postTitlePlaceholder: "Titre",
+    postContentPlaceholder: "Partagez vos pensées...",
+    authorPlaceholder: "Votre Nom (Optionnel)",
+    submit: "Publier",
+    cancel: "Annuler",
+    comments: "Commentaires",
+    addComment: "Ajouter un commentaire...",
+    noPosts: "Aucun post. Soyez le premier !",
+    readMore: "Lire la suite",
+    board: "Forum",
+    communityTab: "Communauté",
+    guideTab: "Guide Idéologique"
   },
   ko: {
     title: "당신의 정치 성향은?",
@@ -116,6 +164,22 @@ export const TRANSLATIONS: Record<LanguageCode, Translation> = {
     copied: "링크 복사됨!",
     ideologies: "정치 이념 백과",
     close: "닫기",
+    // Board
+    boardTitle: "게시판",
+    newPost: "글쓰기",
+    createPost: "새 글 작성",
+    postTitlePlaceholder: "제목",
+    postContentPlaceholder: "내용을 입력하세요...",
+    authorPlaceholder: "작성자 (선택)",
+    submit: "등록",
+    cancel: "취소",
+    comments: "댓글",
+    addComment: "댓글을 남겨주세요...",
+    noPosts: "아직 게시글이 없습니다. 첫 번째 글을 남겨보세요!",
+    readMore: "더 보기",
+    board: "게시판",
+    communityTab: "커뮤니티",
+    guideTab: "이념 가이드"
   },
   ja: {
     title: "あなたの政治的立ち位置は？",
@@ -143,6 +207,22 @@ export const TRANSLATIONS: Record<LanguageCode, Translation> = {
     copied: "コピーしました！",
     ideologies: "政治イデオロギー",
     close: "閉じる",
+    // Board
+    boardTitle: "掲示板",
+    newPost: "新規投稿",
+    createPost: "投稿を作成",
+    postTitlePlaceholder: "タイトル",
+    postContentPlaceholder: "考えを共有しましょう...",
+    authorPlaceholder: "お名前 (任意)",
+    submit: "投稿",
+    cancel: "キャンセル",
+    comments: "コメント",
+    addComment: "コメントを追加...",
+    noPosts: "まだ投稿がありません。最初の投稿者になりましょう！",
+    readMore: "続きを読む",
+    board: "掲示板",
+    communityTab: "コミュニティ",
+    guideTab: "イデオロギーガイド"
   },
 };
 
@@ -228,7 +308,7 @@ export const QUESTIONS: Question[] = [
     text: {
       en: "Traditional family values are the bedrock of society, and the government has a duty to actively promote them in education and media.",
       es: "Los valores familiares tradicionales son la base de la sociedad y el gobierno debe promoverlos activamente.",
-      fr: "Les valores familiales traditionnelles sont le fondement de la société et le gouvernement doit les promouvoir.",
+      fr: "Les valeurs familiales traditionnelles sont le fondement de la société et le gouvernement doit les promouvoir.",
       ko: "전통적인 가족 가치는 사회의 기반이며, 정부는 교육과 미디어를 통해 이를 적극적으로 장려해야 할 의무가 있습니다.",
       ja: "伝統的な家族の価値観は社会の基盤であり、政府は教育やメディアでそれを積極的に推進する義務がある。"
     }
@@ -745,7 +825,7 @@ const IDEOLOGIES_KO: QuadrantInfo[] = [
         name: "론 디샌티스 (Ron DeSantis)",
         coords: { x: 6, y: 8 },
         definition: "공화당 (Republican Party)",
-        explanation: "플로리다 주지사로서 트럼프의 이념을 계승하되 더 유능하고 체계적으로 실행하는 인물로 평가받습니다. 특히 주 행정력을 총동원해 학교 내 성 정체성 교육 금지, 다양성(DEI) 프로그램 폐지 등 진보 문화 확산을 법적으로 차단하는 데 앞장섭니다. 경제적 자유보다는 보수적 가치 수호를 위해 기업과도 싸우는 전사적 면모가 특징입니다.",
+        explanation: "플로리다 주지사로서 트럼프의 이념을 계승하되 더 유능하고 체계적으로 실행하는 인물로 평가받습니다. 특히 주 행정력을 총동원해 학교 내 성 정체성 교육 금지, 다양성(DEI) 프로그램 폐지 등 진보 문화 확산을 법적으로 차단하는 데 앞장섭니다. 경제적 자유보다는 보수적 가치 수호를 위해 기업과도 싸우는(예: 디즈니와의 갈등) 전사적 면모가 특징입니다.",
         figures: "권위적 보수주의, 트럼프 없는 트럼프주의",
         keywords: "PC와의 전쟁, 행정권 발동, 사회 질서"
       }
@@ -761,8 +841,6 @@ export const IDEOLOGIES: Record<LanguageCode, QuadrantInfo[]> = {
   ja: IDEOLOGIES_EN, // Fallback to EN
 };
 
-// Political Figures for the Chart (Scaled to -10 to +10 range)
-// Multiplied original -5/+5 scale by 2.
 export const POLITICAL_FIGURES: PoliticalFigure[] = [
   // Quadrant 1: Authoritarian Right
   {

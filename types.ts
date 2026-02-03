@@ -13,7 +13,7 @@ export interface Translation {
   right: string;
   libertarian: string;
   authoritarian: string;
-  geminiAnalysis: string; // Keeping key for compatibility, but will use as "Analysis" header
+  geminiAnalysis: string;
   restart: string;
   agreeStrongly: string;
   agree: string;
@@ -26,24 +26,37 @@ export interface Translation {
   copied: string;
   ideologies: string;
   close: string;
+  // Board Translations
+  boardTitle: string;
+  newPost: string;
+  createPost: string;
+  postTitlePlaceholder: string;
+  postContentPlaceholder: string;
+  authorPlaceholder: string;
+  submit: string;
+  cancel: string;
+  comments: string;
+  addComment: string;
+  noPosts: string;
+  readMore: string;
+  board: string; // Navigation label
+  communityTab: string;
+  guideTab: string;
 }
 
 export interface Question {
   id: number;
   text: Record<LanguageCode, string>;
   category: 'economic' | 'social';
-  // Positive multiplier means Agreement moves towards Right (Econ) or Auth (Social)
-  // Negative means Agreement moves towards Left (Econ) or Lib (Social)
   multiplier: number; 
 }
 
 export interface QuizResult {
-  economicScore: number; // -10 (Left) to 10 (Right)
-  socialScore: number;   // -10 (Libertarian) to 10 (Authoritarian)
-  answers: Record<number, number>; // questionId -> score (-2 to 2)
+  economicScore: number;
+  socialScore: number;
+  answers: Record<number, number>;
 }
 
-// Deprecated but kept for type compatibility if needed, though we use IdeologyDetail now
 export interface GeminiAnalysis {
   ideology: string;
   description: string;
@@ -56,13 +69,13 @@ export interface IdeologyDetail {
   explanation: string;
   figures: string;
   keywords: string;
-  coords: { x: number; y: number }; // Target coordinates on the compass (-10 to 10)
+  coords: { x: number; y: number };
 }
 
 export interface PoliticalFigure {
   name: string;
-  x: number; // Scale -10 to +10
-  y: number; // Scale -10 to +10
+  x: number;
+  y: number;
   description: string;
 }
 
@@ -70,4 +83,22 @@ export interface QuadrantInfo {
   name: string;
   description: string;
   items: IdeologyDetail[];
+}
+
+// Board Types
+export interface Comment {
+  id: string;
+  author: string;
+  content: string;
+  date: string;
+}
+
+export interface Post {
+  id: string;
+  title: string;
+  author: string;
+  content: string;
+  date: string;
+  comments: Comment[];
+  likes: number;
 }
