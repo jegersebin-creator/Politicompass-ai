@@ -39,9 +39,13 @@ export interface Translation {
   addComment: string;
   noPosts: string;
   readMore: string;
-  board: string; // Navigation label
+  board: string;
   communityTab: string;
   guideTab: string;
+  // Legal / AdSense Compliance
+  privacyPolicy: string;
+  termsOfService: string;
+  ugcWarning: string; // User Generated Content warning
 }
 
 export interface Question {

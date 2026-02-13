@@ -1,8 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, Firestore } from "firebase/firestore";
 
-// TODO: Replace with your actual Firebase configuration keys
-// You should add these to your environment variables (e.g. .env.local)
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
   authDomain: process.env.FIREBASE_AUTH_DOMAIN,
@@ -12,5 +10,25 @@ const firebaseConfig = {
   appId: process.env.FIREBASE_APP_ID
 };
 
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+let db: Firestore | null = null;
+
+// Helper to check if a value is effectively valid
+// Some build tools replace missing env vars with the string "undefined"
+const isValid = (value: string | undefined) => {
+    return value && value !== "undefined" && value !== "";
+};
+
+// Only initialize Firebase if a Project ID is provided and valid.
+if (isValid(firebaseConfig.projectId)) {
+  try {
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    console.log("Firebase initialized successfully.");
+  } catch (error) {
+    console.warn("Firebase initialization error:", error);
+  }
+} else {
+  console.warn("Firebase Project ID missing or invalid. Running in offline/demo mode with Local Storage.");
+}
+
+export { db };

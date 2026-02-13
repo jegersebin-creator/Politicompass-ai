@@ -13,8 +13,34 @@ import {
 } from "firebase/firestore";
 
 const COLLECTION_NAME = "posts";
+const LOCAL_STORAGE_KEY = "politicompass_posts";
+
+// --- Local Storage Fallback Helpers ---
+const getLocalPosts = (): Post[] => {
+  try {
+    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch (e) {
+    console.error("Local storage error:", e);
+    return [];
+  }
+};
+
+const setLocalPosts = (posts: Post[]) => {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
+  } catch (e) {
+    console.error("Local storage error:", e);
+  }
+};
+// --------------------------------------
 
 export const getPosts = async (): Promise<Post[]> => {
+  // If Firebase is not initialized, use Local Storage
+  if (!db) {
+    return getLocalPosts();
+  }
+
   try {
     const q = query(collection(db, COLLECTION_NAME), orderBy("date", "desc"));
     const querySnapshot = await getDocs(q);
@@ -23,21 +49,27 @@ export const getPosts = async (): Promise<Post[]> => {
       ...doc.data()
     } as Post));
   } catch (e) {
-    console.error("Error fetching posts: ", e);
-    return [];
+    console.warn("Error fetching posts from Firebase (using fallback): ", e);
+    return getLocalPosts();
   }
 };
 
 export const savePost = async (post: Post): Promise<void> => {
+  // Fallback
+  if (!db) {
+    const posts = getLocalPosts();
+    // Create a pseudo-ID for local posts
+    const newPost = { ...post, id: `local-${Date.now()}` };
+    posts.unshift(newPost); // Add to top
+    setLocalPosts(posts);
+    return;
+  }
+
   try {
-    // Remove id from post data as Firestore creates its own or we can use setDoc with custom ID.
-    // Here we let Firestore generate the ID, but since our UI expects an ID immediately,
-    // usually we'd wait for the response. For compatibility with the interface,
-    // we just pass the data sans ID, and rely on the fetch to get the ID back.
     const { id, ...postData } = post;
     await addDoc(collection(db, COLLECTION_NAME), {
         ...postData,
-        date: new Date().toISOString() // Use ISO string for better sorting
+        date: new Date().toISOString()
     });
   } catch (e) {
     console.error("Error adding post: ", e);
@@ -45,6 +77,19 @@ export const savePost = async (post: Post): Promise<void> => {
 };
 
 export const saveComment = async (postId: string, comment: Comment): Promise<void> => {
+  // Fallback
+  if (!db) {
+    const posts = getLocalPosts();
+    const postIndex = posts.findIndex(p => p.id === postId);
+    if (postIndex !== -1) {
+      const updatedPost = { ...posts[postIndex] };
+      updatedPost.comments = [...(updatedPost.comments || []), comment];
+      posts[postIndex] = updatedPost;
+      setLocalPosts(posts);
+    }
+    return;
+  }
+
   try {
     const postRef = doc(db, COLLECTION_NAME, postId);
     await updateDoc(postRef, {
@@ -56,6 +101,17 @@ export const saveComment = async (postId: string, comment: Comment): Promise<voi
 };
 
 export const likePost = async (postId: string): Promise<void> => {
+  // Fallback
+  if (!db) {
+    const posts = getLocalPosts();
+    const postIndex = posts.findIndex(p => p.id === postId);
+    if (postIndex !== -1) {
+      posts[postIndex].likes = (posts[postIndex].likes || 0) + 1;
+      setLocalPosts(posts);
+    }
+    return;
+  }
+
   try {
     const postRef = doc(db, COLLECTION_NAME, postId);
     await updateDoc(postRef, {

@@ -6,8 +6,9 @@ import Quiz from './components/Quiz';
 import Result from './components/Result';
 import IdeologySidebar from './components/IdeologySidebar';
 import Board from './components/Board';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
-type AppState = 'intro' | 'quiz' | 'result' | 'board';
+type AppState = 'intro' | 'quiz' | 'result' | 'board' | 'privacy';
 
 function App() {
   const [language, setLanguage] = useState<LanguageCode>('en');
@@ -158,11 +159,29 @@ function App() {
             {appState === 'board' && (
                 <Board translations={t} language={language} onBack={handleGoHome} />
             )}
+
+            {appState === 'privacy' && (
+                <PrivacyPolicy translations={t} onBack={handleGoHome} />
+            )}
         </div>
       </main>
 
-      <footer className="w-full text-center py-6 text-gray-400 text-sm">
-        <p>&copy; {new Date().getFullYear()} PolitiCompass</p>
+      <footer className="w-full text-center py-8 text-gray-400 text-sm bg-gray-50/50 backdrop-blur-sm mt-8 border-t border-gray-200">
+        <p className="mb-2">&copy; {new Date().getFullYear()} PolitiCompass</p>
+        <div className="flex justify-center space-x-6">
+            <button 
+                onClick={() => setAppState('privacy')} 
+                className="hover:text-gray-600 underline decoration-gray-300 underline-offset-2 transition-colors"
+            >
+                {t.privacyPolicy}
+            </button>
+            <button 
+                 onClick={() => setAppState('privacy')} 
+                 className="hover:text-gray-600 underline decoration-gray-300 underline-offset-2 transition-colors"
+            >
+                {t.termsOfService}
+            </button>
+        </div>
       </footer>
 
       {/* Tailwind Animation Styles embedded here since we can't use index.css */}
