@@ -2,15 +2,14 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, Firestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 
-// Configuration using the credentials provided
 const firebaseConfig = {
-  apiKey: "AIzaSyAXHy52wG7MDtLCFfC9L54SOw_4SsqKMaE",
-  authDomain: "politicompass-75937.firebaseapp.com",
-  projectId: "politicompass-75937",
-  storageBucket: "politicompass-75937.firebasestorage.app",
-  messagingSenderId: "49541200611",
-  appId: "1:49541200611:web:088bf54c9fb60b808b23d6",
-  measurementId: "G-8SKEC7SM9T"
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
+  measurementId: process.env.FIREBASE_MEASUREMENT_ID
 };
 
 let db: Firestore | null = null;
@@ -33,7 +32,7 @@ if (isValid(firebaseConfig.projectId)) {
       analytics = getAnalytics(app);
     }
     
-    console.log("Firebase initialized successfully with project:", firebaseConfig.projectId);
+    console.log("Firebase initialized successfully.");
   } catch (error) {
     console.warn("Firebase initialization error:", error);
   }
