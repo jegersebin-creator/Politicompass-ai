@@ -1,19 +1,23 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, Firestore } from "firebase/firestore";
+import { getAnalytics } from "firebase/analytics";
 
+// Configuration using the credentials provided
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID
+  apiKey: "AIzaSyAXHy52wG7MDtLCFfC9L54SOw_4SsqKMaE",
+  authDomain: "politicompass-75937.firebaseapp.com",
+  projectId: "politicompass-75937",
+  storageBucket: "politicompass-75937.firebasestorage.app",
+  messagingSenderId: "49541200611",
+  appId: "1:49541200611:web:088bf54c9fb60b808b23d6",
+  measurementId: "G-8SKEC7SM9T"
 };
 
 let db: Firestore | null = null;
+let app: any = null;
+let analytics: any = null;
 
 // Helper to check if a value is effectively valid
-// Some build tools replace missing env vars with the string "undefined"
 const isValid = (value: string | undefined) => {
     return value && value !== "undefined" && value !== "";
 };
@@ -21,9 +25,15 @@ const isValid = (value: string | undefined) => {
 // Only initialize Firebase if a Project ID is provided and valid.
 if (isValid(firebaseConfig.projectId)) {
   try {
-    const app = initializeApp(firebaseConfig);
+    app = initializeApp(firebaseConfig);
     db = getFirestore(app);
-    console.log("Firebase initialized successfully.");
+    
+    // Initialize Analytics only if in a browser environment
+    if (typeof window !== 'undefined') {
+      analytics = getAnalytics(app);
+    }
+    
+    console.log("Firebase initialized successfully with project:", firebaseConfig.projectId);
   } catch (error) {
     console.warn("Firebase initialization error:", error);
   }
@@ -31,4 +41,4 @@ if (isValid(firebaseConfig.projectId)) {
   console.warn("Firebase Project ID missing or invalid. Running in offline/demo mode with Local Storage.");
 }
 
-export { db };
+export { app, db, analytics };
